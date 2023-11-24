@@ -22,8 +22,8 @@ public class UserRestImpl implements UserRest {
 
      try{
             return userService.signUp(requestMap);
-        }catch (Exception ex){
-            ex.printStackTrace();
+        }catch (Exception e){
+            e.printStackTrace();
         }
      
      return CafeUtils.getResponseEntity(CafeConstant.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
