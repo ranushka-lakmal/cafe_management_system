@@ -21,11 +21,11 @@ public class UserRestImpl implements UserRest {
     public ResponseEntity<String> signUp(Map<String, String> requestMap) {
 
      try{
-         return userService.signUp(requestMap);
+            return userService.signUp(requestMap);
         }catch (Exception e){
-
             e.printStackTrace();
         }
+     
      return CafeUtils.getResponseEntity(CafeConstant.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

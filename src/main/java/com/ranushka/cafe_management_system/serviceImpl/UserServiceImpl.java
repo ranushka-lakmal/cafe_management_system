@@ -23,7 +23,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResponseEntity<String> signUp(Map<String, String> requestMap) {
 
-        log.info("inside signUp", requestMap);
+        log.info("inside signUp{}", requestMap);
         try {
             if (validateSignupMap(requestMap)) {
                 User user = userDao.findByEmailId(requestMap.get("email"));
