@@ -16,18 +16,20 @@ import java.util.Objects;
 public class CustomerUsersDetailsService implements UserDetailsService {
 
 /*    @Autowired*/
-     UserDao userDao;
-
-     private com.ranushka.cafe_management_system.POJO.User userDetails;
+     private final UserDao userDao;
+    @Autowired
+    public CustomerUsersDetailsService(UserDao userDao) {
+        this.userDao = userDao;
+    }
+     private com.ranushka.cafe_management_system.POJO.User userDetails; //com.ranushka.cafe_management_system.POJO.User return like this, because this User class also available in Spring secure.
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         log.info("inside loadUserByUsername {}", username);
         userDetails = userDao.findByEmailId(username);
 
-        if(!Objects.isNull(userDetails)){
+        if(!Objects.isNull(userDetails))
             return new User(userDetails.getEmail(),userDetails.getPassword(),new ArrayList<>());
-
-        }else
+        else
             throw new UsernameNotFoundException("user not found");
 
     }

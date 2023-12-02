@@ -18,7 +18,7 @@ import org.springframework.web.cors.CorsConfiguration;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+public class SecurityConfig extends  WebSecurityConfigurerAdapter {
 
     @Autowired
     CustomerUsersDetailsService customerUsersDetailsService;
@@ -49,7 +49,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/user/login", "/user/signup", "/user/forgotPassword")
+                .antMatchers("/user/login", /*"/user/signup",*/ "/user/forgotPassword")
                 .permitAll()
                 .anyRequest()
                 .authenticated()

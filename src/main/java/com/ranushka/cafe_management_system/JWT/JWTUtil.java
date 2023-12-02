@@ -53,18 +53,13 @@ public class JWTUtil {
                 .signWith(SignatureAlgorithm.HS256, secret).compact();
     }
 
-    public Boolean validateToken(String token, UserDetails userDetails ) {
-
-        final String userName = extractUserName(token);
-
-        return (userName.equals(userDetails.getUsername()) && !isTokenExpired(token));
-    }
 
     public Claims extractAllClaims(String token) {
         return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
     }
 
-    /*private Claims extractAllClaims(String token) {
-        return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
-    }*/
+    public Boolean validateToken(String token, UserDetails userDetails ) {
+        final String userName = extractUserName(token);
+        return (userName.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    }
 }
