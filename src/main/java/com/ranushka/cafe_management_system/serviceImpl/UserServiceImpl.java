@@ -8,6 +8,7 @@ import com.ranushka.cafe_management_system.constents.CafeConstant;
 import com.ranushka.cafe_management_system.dao.UserDao;
 import com.ranushka.cafe_management_system.service.UserService;
 import com.ranushka.cafe_management_system.util.CafeUtils;
+import com.ranushka.cafe_management_system.util.EmailUtils;
 import com.ranushka.cafe_management_system.wrapper.UserWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +41,10 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private final JwtFilter jwtFilter;
+
+    @Autowired
+    EmailUtils emailUtils;
+
 
 
     @Override
@@ -85,7 +90,7 @@ public class UserServiceImpl implements UserService {
             }
 
         } catch (Exception exception){
-            log.error("{}", exception);
+            log.error("{exception ::::}", exception);
         }
         return new ResponseEntity<String>("{\"message\":\""+"Bad credentials." + "\"}", HttpStatus.BAD_REQUEST);
     }
@@ -155,6 +160,8 @@ public class UserServiceImpl implements UserService {
                 if(!optional.isEmpty()){
 
                     userDao.updateStatus(requestMap.get("status"), Integer.parseInt(requestMap.get("id")));
+                    sendMailToAllAdmin(requestMap.get("status"), optional.get().getEmail(), userDao.getAllAdmin( ));
+
                     return CafeUtils.getResponseEntity("user status update successfully", HttpStatus.OK );
                 }else{
                     return CafeUtils.getResponseEntity("user id doesn't exist", HttpStatus.OK );
@@ -166,6 +173,25 @@ public class UserServiceImpl implements UserService {
             ex.printStackTrace();
         }
         return CafeUtils.getResponseEntity(CafeConstant.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+     /*  private void sendMailToAllAdmin(String status, String user, List<String> allAdmin) {
+        allAdmin.remove(jwtFilter.getCurrentUser());
+        if(status!=null && status.equalsIgnoreCase("true"))
+            emailUtils.sendSimpleMessage(jwtFilter.getCurrentUser(), "Account Approved","User:- " + user + "\n is approved by \nADMIN:- " +jwtFilter.getCurrentUser(), allAdmin);
+        else
+            emailUtils.sendSimpleMessage(jwtFilter.getCurrentUser(), "Account Disabled","User:- " + user + "\n is disabled by \nADMIN:- " +jwtFilter.getCurrentUser(), allAdmin);
+    }*/
+
+    private void sendMailToAllAdmin(String status, String user, List<String> allAdmin) {
+
+        allAdmin.remove(jwtFilter.currentUser());
+        if(status!=null && status.equalsIgnoreCase("true")) {
+
+            emailUtils.sendSimpleMessage(jwtFilter.currentUser(), "Account Approved", "User:- " + user + "\n is approved by \nADMIN:- " + jwtFilter.currentUser(), allAdmin);
+        }else{
+            emailUtils.sendSimpleMessage(jwtFilter.currentUser(), "Account Disabled","User:- " + user + "\n is disabled by \nADMIN:- " +jwtFilter.currentUser(), allAdmin);
+
+        }
     }
 /*
 
@@ -204,13 +230,7 @@ public class UserServiceImpl implements UserService {
     }
 */
 
-  /*  private void sendMailToAllAdmin(String status, String user, List<String> allAdmin) {
-        allAdmin.remove(jwtFilter.getCurrentUser());
-        if(status!=null && status.equalsIgnoreCase("true"))
-            emailUtils.sendSimpleMessage(jwtFilter.getCurrentUser(), "Account Approved","User:- " + user + "\n is approved by \nADMIN:- " +jwtFilter.getCurrentUser(), allAdmin);
-        else
-            emailUtils.sendSimpleMessage(jwtFilter.getCurrentUser(), "Account Disabled","User:- " + user + "\n is disabled by \nADMIN:- " +jwtFilter.getCurrentUser(), allAdmin);
-    }*/
+
 
     private boolean validateSignUpMap(Map<String, String> requestMap){
         return requestMap.containsKey("name")
