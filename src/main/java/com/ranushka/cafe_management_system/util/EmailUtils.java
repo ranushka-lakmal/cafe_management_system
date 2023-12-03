@@ -21,9 +21,10 @@ public class EmailUtils {
         message.setSubject(subject);
         message.setText(text);
 
-        if(list != null && list.size() > 0)
-            message.setCc(getCcArray(list ));
+        if(list != null && list.size() > 0) {
+            message.setCc(getCcArray(list));
             emailSender.send(message);
+        }
 
     }
 
