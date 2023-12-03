@@ -8,6 +8,7 @@ import com.ranushka.cafe_management_system.constents.CafeConstant;
 import com.ranushka.cafe_management_system.dao.UserDao;
 import com.ranushka.cafe_management_system.service.UserService;
 import com.ranushka.cafe_management_system.util.CafeUtils;
+import com.ranushka.cafe_management_system.wrapper.UserWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -28,9 +31,17 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private final UserDao userDao;
+
+    @Autowired
     private final AuthenticationManager authenticationManager;
+
+    @Autowired
     private final CustomerUsersDetailsService customerUsersDetailsService;
+
+    @Autowired
     private final JWTUtil jwtUtil;
+
+    @Autowired
     private final JwtFilter jwtFilter;
 
 
@@ -115,6 +126,25 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResponseEntity<String> checkToken() {
         return CafeUtils.getResponseEntity("true", HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<List<UserWrapper>> getAllUser() {
+        try{
+
+            if(jwtFilter.isAdmin()){
+
+                return new ResponseEntity<>(userDao.getAllUser(), HttpStatus.OK);
+
+            }else{
+                return new ResponseEntity<>(new ArrayList<>(), HttpStatus.UNAUTHORIZED);
+            }
+
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+
+        return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 /*
 

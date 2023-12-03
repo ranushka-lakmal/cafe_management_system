@@ -1,5 +1,6 @@
 package com.ranushka.cafe_management_system.POJO;
 
+import jdk.jfr.Name;
 import lombok.Data;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -11,6 +12,8 @@ import javax.persistence.Table;
 import java.io.Serializable;
 
 @NamedQuery(name="User.findByEmailId", query = "select u from User u where u.email=:email")
+
+@NamedQuery(name="User.getAllUser", query = "select new com.ranushka.cafe_management_system.wrapper.UserWrapper(u.id, u.name,u.email,u.contractNumber,u.status) from User u where u.role = 'user'")
 
 @Data
 @Entity
