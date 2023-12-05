@@ -174,6 +174,30 @@ public class UserServiceImpl implements UserService {
         }
         return CafeUtils.getResponseEntity(CafeConstant.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+   /* @Override
+    public ResponseEntity<String> changePassword(Map<String, String> requestMap) {
+
+        try{
+
+            User userObj = userDao.findByEmail(jwtFilter.currentUser());
+
+            if(!userObj.equals(null)){
+
+                if(userObj.getPassword().equals(requestMap.get("oldPassword"))){
+
+                    userDao.save(userObj);
+                    return CafeUtils.getResponseEntity("Password Successfully Updated", HttpStatus.OK);
+                }
+                return CafeUtils.getResponseEntity("incorrect old password", HttpStatus.BAD_REQUEST);
+            }
+            return CafeUtils.getResponseEntity(CafeConstant.USER_CANT_FIND, HttpStatus.INTERNAL_SERVER_ERROR);
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+
+        return CafeUtils.getResponseEntity(CafeConstant.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+    }*/
      /*  private void sendMailToAllAdmin(String status, String user, List<String> allAdmin) {
         allAdmin.remove(jwtFilter.getCurrentUser());
         if(status!=null && status.equalsIgnoreCase("true"))
@@ -193,12 +217,12 @@ public class UserServiceImpl implements UserService {
 
         }
     }
-/*
+
 
     @Override
     public ResponseEntity<String> changePassword(Map<String, String> requestMap) {
         try {
-            User user = userDao.findByEmail(jwtFilter.getCurrentUser());
+            User user = userDao.findByEmail(jwtFilter.currentUser());
             if(user != null){
                 if(user.getPassword().equalsIgnoreCase(requestMap.get("oldPassword"))){
                     user.setPassword(requestMap.get("newPassword"));
@@ -213,7 +237,7 @@ public class UserServiceImpl implements UserService {
         }
         return CafeUtils.getResponseEntity(CafeConstant.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-*/
+
 
 /*
     @Override
