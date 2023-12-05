@@ -1,5 +1,6 @@
 package com.ranushka.cafe_management_system.serviceImpl;
 
+import com.google.common.base.Strings;
 import com.ranushka.cafe_management_system.JWT.CustomerUsersDetailsService;
 import com.ranushka.cafe_management_system.JWT.JWTUtil;
 import com.ranushka.cafe_management_system.JWT.JwtFilter;
@@ -239,20 +240,18 @@ public class UserServiceImpl implements UserService {
     }
 
 
-/*
     @Override
     public ResponseEntity<String> forgotPassword(Map<String, String> requestMap) {
         try {
-            User user = userDao.findByEmailId(requestMap.get("email"));
+            User user = userDao.findByEmail(requestMap.get("email"));
             if(!Objects.isNull(user) && !Strings.isNullOrEmpty(user.getEmail()))
                 emailUtils.forgotMail(user.getEmail(), "Credentials by Cafe Management System", user.getPassword());
-            return CafeUtils.getResponseEntity("Check your email for credentials", HttpStatus.BAD_GATEWAY);
+            return CafeUtils.getResponseEntity("Check your email for credentials", HttpStatus.OK);
         } catch (Exception exception){
             exception.printStackTrace();
         }
-        return CafeUtils.getResponseEntity(CafeConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+        return CafeUtils.getResponseEntity(CafeConstant.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-*/
 
 
 
