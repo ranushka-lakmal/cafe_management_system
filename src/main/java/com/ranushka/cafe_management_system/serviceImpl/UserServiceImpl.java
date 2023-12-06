@@ -1,5 +1,6 @@
 package com.ranushka.cafe_management_system.serviceImpl;
 
+import com.google.common.base.Strings;
 import com.ranushka.cafe_management_system.JWT.CustomerUsersDetailsService;
 import com.ranushka.cafe_management_system.JWT.JWTUtil;
 import com.ranushka.cafe_management_system.JWT.JwtFilter;
@@ -8,6 +9,7 @@ import com.ranushka.cafe_management_system.constents.CafeConstant;
 import com.ranushka.cafe_management_system.dao.UserDao;
 import com.ranushka.cafe_management_system.service.UserService;
 import com.ranushka.cafe_management_system.util.CafeUtils;
+import com.ranushka.cafe_management_system.util.EmailUtils;
 import com.ranushka.cafe_management_system.wrapper.UserWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +42,10 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private final JwtFilter jwtFilter;
+
+    @Autowired
+    EmailUtils emailUtils;
+
 
 
     @Override
@@ -85,7 +91,7 @@ public class UserServiceImpl implements UserService {
             }
 
         } catch (Exception exception){
-            log.error("{}", exception);
+            log.error("{exception ::::}", exception);
         }
         return new ResponseEntity<String>("{\"message\":\""+"Bad credentials." + "\"}", HttpStatus.BAD_REQUEST);
     }
@@ -155,6 +161,8 @@ public class UserServiceImpl implements UserService {
                 if(!optional.isEmpty()){
 
                     userDao.updateStatus(requestMap.get("status"), Integer.parseInt(requestMap.get("id")));
+                    sendMailToAllAdmin(requestMap.get("status"), optional.get().getEmail(), userDao.getAllAdmin( ));
+
                     return CafeUtils.getResponseEntity("user status update successfully", HttpStatus.OK );
                 }else{
                     return CafeUtils.getResponseEntity("user id doesn't exist", HttpStatus.OK );
@@ -167,12 +175,55 @@ public class UserServiceImpl implements UserService {
         }
         return CafeUtils.getResponseEntity(CafeConstant.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-/*
+
+   /* @Override
+    public ResponseEntity<String> changePassword(Map<String, String> requestMap) {
+
+        try{
+
+            User userObj = userDao.findByEmail(jwtFilter.currentUser());
+
+            if(!userObj.equals(null)){
+
+                if(userObj.getPassword().equals(requestMap.get("oldPassword"))){
+
+                    userDao.save(userObj);
+                    return CafeUtils.getResponseEntity("Password Successfully Updated", HttpStatus.OK);
+                }
+                return CafeUtils.getResponseEntity("incorrect old password", HttpStatus.BAD_REQUEST);
+            }
+            return CafeUtils.getResponseEntity(CafeConstant.USER_CANT_FIND, HttpStatus.INTERNAL_SERVER_ERROR);
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+
+        return CafeUtils.getResponseEntity(CafeConstant.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+    }*/
+     /*  private void sendMailToAllAdmin(String status, String user, List<String> allAdmin) {
+        allAdmin.remove(jwtFilter.getCurrentUser());
+        if(status!=null && status.equalsIgnoreCase("true"))
+            emailUtils.sendSimpleMessage(jwtFilter.getCurrentUser(), "Account Approved","User:- " + user + "\n is approved by \nADMIN:- " +jwtFilter.getCurrentUser(), allAdmin);
+        else
+            emailUtils.sendSimpleMessage(jwtFilter.getCurrentUser(), "Account Disabled","User:- " + user + "\n is disabled by \nADMIN:- " +jwtFilter.getCurrentUser(), allAdmin);
+    }*/
+
+    private void sendMailToAllAdmin(String status, String user, List<String> allAdmin) {
+
+        allAdmin.remove(jwtFilter.currentUser());
+        if(status!=null && status.equalsIgnoreCase("true")) {
+
+            emailUtils.sendSimpleMessage(jwtFilter.currentUser(), "Account Approved", "User:- " + user + "\n is approved by \nADMIN:- " + jwtFilter.currentUser(), allAdmin);
+        }else{
+            emailUtils.sendSimpleMessage(jwtFilter.currentUser(), "Account Disabled","User:- " + user + "\n is disabled by \nADMIN:- " +jwtFilter.currentUser(), allAdmin);
+
+        }
+    }
+
 
     @Override
     public ResponseEntity<String> changePassword(Map<String, String> requestMap) {
         try {
-            User user = userDao.findByEmail(jwtFilter.getCurrentUser());
+            User user = userDao.findByEmail(jwtFilter.currentUser());
             if(user != null){
                 if(user.getPassword().equalsIgnoreCase(requestMap.get("oldPassword"))){
                     user.setPassword(requestMap.get("newPassword"));
@@ -187,30 +238,22 @@ public class UserServiceImpl implements UserService {
         }
         return CafeUtils.getResponseEntity(CafeConstant.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-*/
 
-/*
+
     @Override
     public ResponseEntity<String> forgotPassword(Map<String, String> requestMap) {
         try {
-            User user = userDao.findByEmailId(requestMap.get("email"));
+            User user = userDao.findByEmail(requestMap.get("email"));
             if(!Objects.isNull(user) && !Strings.isNullOrEmpty(user.getEmail()))
                 emailUtils.forgotMail(user.getEmail(), "Credentials by Cafe Management System", user.getPassword());
-            return CafeUtils.getResponseEntity("Check your email for credentials", HttpStatus.BAD_GATEWAY);
+            return CafeUtils.getResponseEntity("Check your email for credentials", HttpStatus.OK);
         } catch (Exception exception){
             exception.printStackTrace();
         }
-        return CafeUtils.getResponseEntity(CafeConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+        return CafeUtils.getResponseEntity(CafeConstant.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-*/
 
-  /*  private void sendMailToAllAdmin(String status, String user, List<String> allAdmin) {
-        allAdmin.remove(jwtFilter.getCurrentUser());
-        if(status!=null && status.equalsIgnoreCase("true"))
-            emailUtils.sendSimpleMessage(jwtFilter.getCurrentUser(), "Account Approved","User:- " + user + "\n is approved by \nADMIN:- " +jwtFilter.getCurrentUser(), allAdmin);
-        else
-            emailUtils.sendSimpleMessage(jwtFilter.getCurrentUser(), "Account Disabled","User:- " + user + "\n is disabled by \nADMIN:- " +jwtFilter.getCurrentUser(), allAdmin);
-    }*/
+
 
     private boolean validateSignUpMap(Map<String, String> requestMap){
         return requestMap.containsKey("name")
