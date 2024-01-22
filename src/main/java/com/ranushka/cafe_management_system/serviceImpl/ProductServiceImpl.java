@@ -7,11 +7,14 @@ import com.ranushka.cafe_management_system.constents.CafeConstant;
 import com.ranushka.cafe_management_system.dao.ProductDao;
 import com.ranushka.cafe_management_system.service.ProductService;
 import com.ranushka.cafe_management_system.util.CafeUtils;
+import com.ranushka.cafe_management_system.wrapper.ProductWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -42,7 +45,6 @@ public class ProductServiceImpl implements ProductService {
 
         return CafeUtils.getResponseEntity(CafeConstant.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
 
 
     private boolean validateProductMap(Map<String, String> requestMap, boolean validateId) {
@@ -78,5 +80,16 @@ public class ProductServiceImpl implements ProductService {
         product.setPrice(Double.parseDouble(requestMap.get("price")));
 
         return product;
+    }
+
+    @Override
+    public ResponseEntity<List<ProductWrapper>> getAllProduct() {
+        try{
+
+            return new ResponseEntity<>(productDao.getAllProduct(), HttpStatus.OK);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
