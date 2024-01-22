@@ -8,6 +8,7 @@ import com.ranushka.cafe_management_system.dao.ProductDao;
 import com.ranushka.cafe_management_system.service.ProductService;
 import com.ranushka.cafe_management_system.util.CafeUtils;
 import com.ranushka.cafe_management_system.wrapper.ProductWrapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +17,8 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
+import java.util.Optional;
+@Slf4j
 @Service
 public class ProductServiceImpl implements ProductService {
 
@@ -49,20 +51,24 @@ public class ProductServiceImpl implements ProductService {
 
     private boolean validateProductMap(Map<String, String> requestMap, boolean validateId) {
 
+        log.info("inside validateProductMap");
         if(requestMap.containsKey("name")){
+            log.info("inside containsKey--> name");
             if(requestMap.containsKey("id") && validateId){
-
+                log.info("inside containsKey--> id");
+                return true;
             } else if (!validateId) {
-
+                log.info("inside !validateId");
                 return true;
             }
         }
-
+        log.info("validateProductMap false");
         return false;
     }
 
     private Product getProductFromMap(Map<String, String> requestMap, boolean isAdd) {
 
+        log.info("inside getProductFromMap");
         Category category = new Category();
         category.setId(Integer.parseInt(requestMap.get("categoryId")));
 
@@ -77,13 +83,15 @@ public class ProductServiceImpl implements ProductService {
         product.setCategory(category);
         product.setName(requestMap.get("name"));
         product.setDesciption(requestMap.get("description"));
-        product.setPrice(Double.parseDouble(requestMap.get("price")));
+        product.setPrice(Integer.parseInt(requestMap.get("price")));
 
         return product;
     }
 
     @Override
     public ResponseEntity<List<ProductWrapper>> getAllProduct() {
+
+        log.info("inside getAllProduct");
         try{
 
             return new ResponseEntity<>(productDao.getAllProduct(), HttpStatus.OK);
@@ -92,4 +100,85 @@ public class ProductServiceImpl implements ProductService {
         }
         return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+   /* @Override
+    public ResponseEntity<String> updateProduct(Map<String, String> requestMap) {
+
+        log.info("inside updateProduct");
+        try {
+
+            if(jwtFilter.isAdmin()){
+
+                if(validateProductMap(requestMap, true)){
+                   Optional<Product> optional = productDao.findById(Integer.parseInt(requestMap.get("id")));
+
+                   if(!optional.isEmpty()){
+
+                       Product product = getProductFromMap(requestMap, true);
+                       product.setStatus(optional.get().getStatus());
+                       productDao.save(product);
+
+                       return CafeUtils.getResponseEntity("Product Updated Successfully!!", HttpStatus.OK);
+                   }else {
+                       return CafeUtils.getResponseEntity("Product Id does not exist", HttpStatus.OK);
+                   }
+                }else {
+                    return CafeUtils.getResponseEntity(CafeConstant.INVALIDATE_DATA, HttpStatus.BAD_REQUEST);
+                }
+            }else {
+                return CafeUtils.getResponseEntity(CafeConstant.UNAUTHORIZED_ACCESS, HttpStatus.UNAUTHORIZED);
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return CafeUtils.getResponseEntity(CafeConstant.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+    }*/
+
+
+    @Override
+    public ResponseEntity<String> updateProduct(Map<String, String> requestMap) {
+
+        log.info("inside updateProduct");
+        try {
+
+            if (jwtFilter.isAdmin()) {
+                log.info("update product check isAdmin-------------");
+                if (validateProductMap(requestMap, true)) {
+                    log.info("update product check validateProductMap-------------");
+                    Optional<Product> optional = productDao.findById(Integer.parseInt(requestMap.get("id")));
+
+                    if (!optional.isEmpty()) {
+
+                        Product existingProduct = optional.get();
+                        Product updatedProduct = getProductFromMap(requestMap, true);
+
+                        // Set only the fields that can be updated
+                        existingProduct.setName(updatedProduct.getName());
+                        existingProduct.setDesciption(updatedProduct.getDesciption());
+                        existingProduct.setPrice(updatedProduct.getPrice());
+
+                        log.info("before update product-------------");
+                        productDao.save(existingProduct);
+
+                        return CafeUtils.getResponseEntity("Product Updated Successfully!!", HttpStatus.OK);
+                    } else {
+                        return CafeUtils.getResponseEntity("Product Id does not exist", HttpStatus.OK);
+                    }
+                } else {
+                    return CafeUtils.getResponseEntity(CafeConstant.INVALIDATE_DATA, HttpStatus.BAD_REQUEST);
+                }
+            } else {
+                return CafeUtils.getResponseEntity(CafeConstant.UNAUTHORIZED_ACCESS, HttpStatus.UNAUTHORIZED);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return CafeUtils.getResponseEntity(CafeConstant.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+
 }

@@ -34,7 +34,7 @@ public class Product implements Serializable {
     private String desciption;
 
     @Column(name = "price")
-    private double price;
+    private Integer price;
 
     @Column(name = "status")
     private String status;
