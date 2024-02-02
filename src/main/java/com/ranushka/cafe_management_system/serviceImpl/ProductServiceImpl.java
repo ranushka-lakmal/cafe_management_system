@@ -101,42 +101,6 @@ public class ProductServiceImpl implements ProductService {
         return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-   /* @Override
-    public ResponseEntity<String> updateProduct(Map<String, String> requestMap) {
-
-        log.info("inside updateProduct");
-        try {
-
-            if(jwtFilter.isAdmin()){
-
-                if(validateProductMap(requestMap, true)){
-                   Optional<Product> optional = productDao.findById(Integer.parseInt(requestMap.get("id")));
-
-                   if(!optional.isEmpty()){
-
-                       Product product = getProductFromMap(requestMap, true);
-                       product.setStatus(optional.get().getStatus());
-                       productDao.save(product);
-
-                       return CafeUtils.getResponseEntity("Product Updated Successfully!!", HttpStatus.OK);
-                   }else {
-                       return CafeUtils.getResponseEntity("Product Id does not exist", HttpStatus.OK);
-                   }
-                }else {
-                    return CafeUtils.getResponseEntity(CafeConstant.INVALIDATE_DATA, HttpStatus.BAD_REQUEST);
-                }
-            }else {
-                return CafeUtils.getResponseEntity(CafeConstant.UNAUTHORIZED_ACCESS, HttpStatus.UNAUTHORIZED);
-            }
-
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-
-        return CafeUtils.getResponseEntity(CafeConstant.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
-    }*/
-
-
     @Override
     public ResponseEntity<String> updateProduct(Map<String, String> requestMap) {
 
@@ -177,6 +141,27 @@ public class ProductServiceImpl implements ProductService {
             e.printStackTrace();
         }
 
+        return CafeUtils.getResponseEntity(CafeConstant.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<String> deleteProduct(Integer id) {
+        try{
+
+            if(jwtFilter.isAdmin()){
+                Optional optional = productDao.findById(id);
+                if (!optional.isEmpty()){
+                    productDao.deleteById(id);
+                    return CafeUtils.getResponseEntity("Product deleted successfully", HttpStatus.OK);
+                }
+                return CafeUtils.getResponseEntity("product id does not exist", HttpStatus.OK);
+            }else{
+                return CafeUtils.getResponseEntity(CafeConstant.UNAUTHORIZED_ACCESS, HttpStatus.UNAUTHORIZED);
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         return CafeUtils.getResponseEntity(CafeConstant.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
