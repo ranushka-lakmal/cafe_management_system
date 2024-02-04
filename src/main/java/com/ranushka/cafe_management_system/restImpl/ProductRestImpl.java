@@ -82,4 +82,15 @@
             }
             return CafeUtils.getResponseEntity(CafeConstant.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+
+        @Override
+        public ResponseEntity<List<ProductWrapper>> getByCategory(Integer id) {
+
+            try{
+                return productService.getByCategory(id);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
