@@ -15,6 +15,8 @@ import java.io.Serializable;
 
 @NamedQuery(name = "Product.getProductByCategory", query = "SELECT new com.ranushka.cafe_management_system.wrapper.ProductWrapper(p.id,p.name) FROM Product p WHERE p.category.id=:id AND p.status='true'")
 
+@NamedQuery(name = "Product.getProductById", query = "SELECT new com.ranushka.cafe_management_system.wrapper.ProductWrapper(p.id,p.name,p.desciption,p.price) FROM Product p WHERE p.id=:id")
+
 @Data
 @Entity
 @DynamicInsert
