@@ -19,7 +19,10 @@ public interface BillRest {
     @GetMapping(path = "/getBills")
     ResponseEntity<List<Bill>> getBills();
 
-    @GetMapping(path = "/getPdf")
+    @PostMapping(path = "/getPdf")
     ResponseEntity<byte[]> getPdf(@RequestBody Map<String, Object> requestMap);
+
+   /* @PostMapping(path = "/deleteBills")
+    ResponseEntity<String> deleteBill*/
 
 }
