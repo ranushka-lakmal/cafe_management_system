@@ -38,6 +38,17 @@ public class BillRestImpl implements BillRest {
             e.printStackTrace();
         }
 
+        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<byte[]> getPdf(Map<String, Object> requestMap) {
+
+        try{
+            return billService.getPdf(requestMap);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         return null;
     }
 }

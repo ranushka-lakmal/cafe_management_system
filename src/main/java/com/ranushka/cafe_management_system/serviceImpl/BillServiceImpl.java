@@ -12,13 +12,17 @@ import com.ranushka.cafe_management_system.dao.BillDao;
 import com.ranushka.cafe_management_system.service.BillService;
 import com.ranushka.cafe_management_system.util.CafeUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.pdfbox.io.IOUtils;
 import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -196,4 +200,43 @@ public class BillServiceImpl implements BillService {
         }
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
+
+    @Override
+    public ResponseEntity<byte[]> getPdf(Map<String, Object> requestMap) {
+
+        log.info("Inside getPdf::::: requestMap {}", requestMap);
+        try{
+            byte[] bytesArray = new byte[0];
+            if(!requestMap.containsKey("uuid") && validateRequestMap(requestMap))
+                return new ResponseEntity<>(bytesArray, HttpStatus.BAD_REQUEST);
+            // im using mac so set path as '//', for windows use '\\'
+            String filePath = CafeConstant.STORE_LOCATION+"//"+(String) requestMap.get("uuid")+".pdf";
+
+            if(CafeUtils.isFileExist(filePath)){
+                bytesArray = getByteArray(filePath);
+                return new ResponseEntity<>(bytesArray, HttpStatus.OK);
+            }else{
+                requestMap.put("isGenerate", false);
+                generateReport(requestMap);
+                bytesArray = getByteArray(filePath);
+
+                return new ResponseEntity<>(bytesArray, HttpStatus.OK);
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private byte[] getByteArray(String filePath) throws Exception{
+
+        File initFile = new File(filePath);
+        InputStream targetStream = new FileInputStream(initFile);
+        byte[] bytearray = IOUtils.toByteArray(targetStream);
+        targetStream.close();
+        return bytearray;
+    }
+
+
 }
