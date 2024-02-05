@@ -19,6 +19,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -181,5 +183,17 @@ public class BillServiceImpl implements BillService {
                 requestMap.containsKey("email") &&
                 requestMap.containsKey("productDetails") &&
                 requestMap.containsKey("totalAmount");
+    }
+
+    @Override
+    public ResponseEntity<List<Bill>> getBills() {
+
+        List<Bill> list = new ArrayList<>();
+        if (jwtFilter.isAdmin()){
+            list = billDao.getAllBills();
+        }else{
+            list = billDao.getBillByUserName(jwtFilter.currentUser());
+        }
+        return new ResponseEntity<>(list, HttpStatus.OK);
     }
 }
