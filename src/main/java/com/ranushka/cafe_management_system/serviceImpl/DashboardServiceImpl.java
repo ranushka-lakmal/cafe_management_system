@@ -26,8 +26,8 @@ public class DashboardServiceImpl implements DashboardService {
     @Autowired
     BillDao billDao;
 
-  /*  @Autowired
-    UserDao userDao;*/
+    @Autowired
+    UserDao userDao;
 
 
     @Override
